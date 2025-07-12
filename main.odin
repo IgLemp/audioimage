@@ -133,7 +133,9 @@ slice_to_T :: #force_inline proc(slice: $S, $T: typeid) -> T {
     return (cast(T)(raw_data(slice[:])))
 }
 
-
+// PARSER ---------------------------------------------------------------------
+// Simple state mashine
+// For context: I'm drunk as fuck
 
 PARSER_STATE :: enum {
     Undef,
@@ -150,6 +152,7 @@ HELP_MESSAGE :: `
 -D --debug     Show debug logs
 `
 
+// This (with some reflection) actually could be a very minimal library
 parse_args :: proc() -> (hilbert: bool, im_name: string, log_level: log.Level ) {
     parser: PARSER_STATE = .Undef
     known_char: rune = ' '
@@ -160,13 +163,48 @@ parse_args :: proc() -> (hilbert: bool, im_name: string, log_level: log.Level ) 
 
     for arg in os.args[1:] {
         // log.debug(arg)
-        switch arg {
-        case "-h": fallthrough; case "--help"    : { fmt.println(HELP_MESSAGE); os.exit(0) }
-        case "-H": fallthrough; case "--hilbert" : { hilbert = true }
-        case "-L": fallthrough; case "--linear"  : { hilbert = false }
-        case "-D": fallthrough; case "--debug"   : { log_level = .Debug }
-        case: im_name = arg
+        for c in arg {
+            // log.debug(c)
+            if parser == .Undef {
+                if c == '-' { parser = .Arg_S; continue }
+                else        { parser = .Raw;   continue }
+            }
+
+            if parser == .Arg_S { if c == '-' { parser = .Arg_L; continue } }
+
+            // Because first assertion failed... (in a way)
+            // My conception is that we should've'd a rune by now
+            if parser == .Arg_S {
+                // Handle this sh** manualy, I don't know man
+                switch c {
+                case 'h': { fmt.println(HELP_MESSAGE); os.exit(0) }
+                case 'H': { hilbert = true }
+                case 'L': { hilbert = false }
+                case 'D': { log_level = .Debug }
+                }
+            }
+
+            if parser == .Arg_L {
+                switch arg[2:] {
+                case "help":    { fmt.println(HELP_MESSAGE); os.exit(0) }
+                case "hilbert": { hilbert = true }
+                case "linear":  { hilbert = false }
+                case "debug":   { log_level = .Debug }
+                }
+            }
+
+            if parser == .Raw {
+                im_name = arg
+                break
+
+                // You're in char loop dumbass
+                // this will skip to next arg :)
+                // No problem
+            }
         }
+
+        // Reset parser state
+        parser = .Undef
     }
 
     return hilbert, im_name, log_level
