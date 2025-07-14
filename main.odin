@@ -128,12 +128,10 @@ slice_to_T :: #force_inline proc(slice: $S, $T: typeid) -> T {
 
 
 
-HELP_MESSAGE :: `
--h --help      Prints help
+HELP_MESSAGE :: `-h --help      Prints help
 -H --hilbert   Converts audio to a Hilbert curve
 -L --linear    Converts audio to a linear representation
--D --debug     Show debug logs
-`
+-D --debug     Show debug logs`
 
 parse_args :: proc() -> (hilbert: bool, im_name: string, log_level: log.Level ) {
     hilbert = false
