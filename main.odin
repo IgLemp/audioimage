@@ -104,14 +104,14 @@ main :: proc() {
 
         image_hilbert, ok_i_h := image.pixels_to_image(pixels[:], h_side, h_side)
         if !ok_i_h { log.debug("Error while making image") }
-        ok_f_h := bmp.save_to_file("./audio_hilbert.bmp", &image_hilbert)
-        log.debug(ok_f_h)
-    } else {
-        pixels: [][3]u8 = make([][3]u8, square_side * square_side)
-        for i in 0..<(square_side * square_side) {
-            pixels[i][0] = pcm_audio[i * 3 + 0]
-            pixels[i][1] = pcm_audio[i * 3 + 1]
-            pixels[i][2] = pcm_audio[i * 3 + 2]
+            ok_f_h := bmp.save_to_file("./audio_hilbert.bmp", &image_hilbert)
+            log.debug(ok_f_h)
+        } else {
+            pixels: [][3]u8 = make([][3]u8, square_side * square_side)
+            for i in 0..<(square_side * square_side) {
+                pixels[i][0] = pcm_audio[i * 3 + 0]
+                pixels[i][1] = pcm_audio[i * 3 + 1]
+                pixels[i][2] = pcm_audio[i * 3 + 2]
         }
 
         image_linear, ok_i_l := image.pixels_to_image(pixels[:], square_side, square_side)
